@@ -30,7 +30,7 @@ jobs:
         run: bash ./bin/install.sh
 
       - name: Test
-        with:
+        env:
           PIPE_EMAIL: ${{ secrets.PIPE_EMAIL }}
           PIPE_PASSWORD: ${{ secrets.PIPE_PASSWORD }}
           PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
