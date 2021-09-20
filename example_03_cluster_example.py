@@ -4,11 +4,11 @@ from library.models.job_type import JobType
 from library.pipebio_client import PipebioClient
 
 
-def example_03_cluster_example(sequence_document_id: int,target_folder_id:int = None):
-    '''
+def example_03_cluster_example(sequence_document_id: int, target_folder_id: int = None):
+    """
     Cluster Example
     Clusters a known annotated document from a known project.
-    '''
+    """
     project_name = os.environ['PROJECT_NAME']
 
     if sequence_document_id is None or project_name is None:
@@ -30,7 +30,7 @@ def example_03_cluster_example(sequence_document_id: int,target_folder_id:int = 
     # Find a specific project having a name "Example".
     example_project = next((project for project in projects if project['name'] == project_name), None)
     if example_project is None:
-        print('Error: Example project not found')
+        print(f'Error: Example project named {project_name} not found')
         quit()
 
     # Find a specific document with an id "22333"

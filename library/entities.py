@@ -123,6 +123,12 @@ class Entities:
         return columns
 
     def download_original_file(self, entity_id: int, destination_filename: str) -> None:
+        """
+        Download the originally uploaded file corresponding to a PipeBio document.
+        Two requests are made:
+        1. Request a signed url for this document (GET /api/v2/entities/:id/original)
+        2. Download the data from that signed url (GET <result-from-step-1>)
+        """
         # First request a signed url from PipeBio.
         signed_url_response = self.session.get(
             '{}/api/v2/entities/{}/original'.format(self.url, entity_id),
