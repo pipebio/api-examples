@@ -71,6 +71,11 @@ class PipebioClient:
         entity_name = entity['name']
         user = self.authentication.user
 
+        path_parts = entity['path'].split('.')
+        # Last path part is always the current document.
+        # Any before that are ancestor folders, the first being the parent.
+        parent_folder_id = int(path_parts[-2]) if len(path_parts) > 1 else None
+
         job_id = self.jobs.create(
             owner_id=user['orgs'][0]['id'],
             shareable_id=entity['ownerId'],
@@ -82,7 +87,7 @@ class PipebioClient:
                 "format": format,
                 "fileName": entity_name,
                 "selection": [],
-                "targetFolderId": entity['path'].split('.')[-2],
+                "targetFolderId": parent_folder_id,
             }
         )
 
@@ -91,8 +96,14 @@ class PipebioClient:
 
         links = job['outputLinks']
 
+        outputs = []
+
         for link in links:
             testfile = URLopener()
 
             destination = os.path.join(destination_folder, entity_name)
             testfile.retrieve(link['url'], destination)
+
+            outputs.append(destination)
+
+        return outputs

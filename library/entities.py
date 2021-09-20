@@ -121,3 +121,26 @@ class Entities:
                 columns.append(Column(field['name'], TableColumnType[field['type']], description))
 
         return columns
+
+    def download_original_file(self, entity_id: int, destination_filename: str) -> None:
+        # First request a signed url from PipeBio.
+        signed_url_response = self.session.get(
+            '{}/api/v2/entities/{}/original'.format(self.url, entity_id),
+        )
+
+        # Did the signed-url request work ok?
+        Util.raise_detailed_error(signed_url_response)
+
+        # Parse the results to get the signed url.
+        download_url = signed_url_response.json()['url']
+
+        # Download the original file.
+        download_response = requests.get(download_url)
+
+        # Did the download request work ok?
+        Util.raise_detailed_error(download_response)
+
+        # Write the result to disk in chunks.
+        with open(destination_filename, 'wb') as f:
+            for chunk in download_response.iter_content(chunk_size=8192):
+                f.write(chunk)

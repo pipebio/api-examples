@@ -14,6 +14,7 @@
 
 ## Getting started
 - Check out the files with names like `example*.py`; to run them use `python example_01_upload_example.py` for example.
+- To ensure these files are up to date and really work, we have integration tests running in `example_itest.py`.
 - Please contact owen@pipebio.com for help.
 
 ## Contributing
