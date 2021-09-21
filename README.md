@@ -4,7 +4,7 @@
 
 - Examples showing how to interact with the Pipe|bio REST api through python.
 - See [https://docs.pipebio.com](https://docs.pipebio.com) for full API documentation.
-- Currently in python only.
+- Examples currently wrap our API endpoints in python only, you can of course use the endpoints in any language (java, javascript, c#, etc)
 - All endpoints are under heavy development and subject to change. Use at your own risk.
 
 ## Installation
