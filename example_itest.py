@@ -1,5 +1,6 @@
 import gzip
 import os
+import re
 import unittest
 
 from example_01_upload_example import example_01_upload_example
@@ -33,6 +34,8 @@ class ExampleE2ETests(unittest.TestCase):
         result = example_02a_download_result_as_tsv(296716)
 
         # Extract the compressed file to tsv.
+        # The tsv is downloaded in chunks which must be assembled.
+        # In this case there is a single chunk, so no assembly is required.
         contents = self.unzip(result[0])
         lines = contents.split(b'\n')
 
@@ -63,9 +66,9 @@ class ExampleE2ETests(unittest.TestCase):
         Download a PipeBio file and specify the result format. In this case we choose Genbank format.
         """
         result = example_02c_download_result_to_biological_format(296717)
-
+        # NOTE: The date is intentionally modified below so that our tests will pass, even as time marches on.
         expected_genbank = '''
-LOCUS       P00863_C03               112 aa                     UNK 20-SEP-2021
+LOCUS       P00863_C03               112 aa                     UNK XX-XXX-XXXX
 DEFINITION  crenezumab.
 ACCESSION   1
 VERSION     1
@@ -115,11 +118,14 @@ FEATURES             Location/Qualifiers
 ORIGIN
         1 evqlvesggg lvqpggslrl scaasgftfs sygmswvrqa pgkglelvas insnggstyy
        61 pdsvkgrfti srdnaknsly lqmnslraed tavyycasgd ywgqgttvtv ss
-//
-        '''
+//'''.strip()
         with open(result[0], 'rt') as handle:
             actual_genbank = handle.read()
-            self.assertEqual(actual_genbank.strip(), expected_genbank.strip())
+            # Replace the date; just to make the test pass.
+            actual_genbank = re.sub(r'([0-9]+-[A-Za-z]+-[0-9]+)', 'XX-XXX-XXXX', actual_genbank.strip())
+
+            # Files should match perfectly.
+            self.assertEqual(actual_genbank, expected_genbank.strip())
 
     def test_example_02d_downloads_the_original_file_to_disk(self):
         """

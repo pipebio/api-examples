@@ -119,7 +119,7 @@ class Sequences:
         """
 
         file_path = destination if destination is not None else Sequences.get_filepath_for_entity_id(entity_id)
-        url = '{}/entities/{}/_extract'.format(self.url, entity_id)
+        url = '{}/entities/{}/_extract?sort=id'.format(self.url, entity_id)
         print('downloading "{}" to "{}".'.format(url, file_path))
 
         paths = []
