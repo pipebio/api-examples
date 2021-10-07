@@ -70,4 +70,4 @@ def example_03_cluster_example(sequence_document_id: int, target_folder_id: int 
 
 
 if __name__ == "__main__":
-    example_03_cluster_example(296716)
+    example_03_cluster_example(298154)
