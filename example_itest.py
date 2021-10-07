@@ -33,19 +33,16 @@ class ExampleE2ETests(unittest.TestCase):
         """
         result = example_02a_download_result_as_tsv(296716)
 
-        # Extract the compressed file to tsv.
-        # The tsv is downloaded in chunks which must be assembled.
-        # In this case there is a single chunk, so no assembly is required.
-        contents = self.unzip(result[0])
-        lines = contents.split(b'\n')
+        contents = self.read(result)
+        lines = contents.split('\n')
 
         # Check header and first line.
         header = lines[0]
-        expected_header = b'id\tname\tname_sort\tdescription\tdescription_sort\tsequence\tlength\tannotations\tquality\tstatus\terrors\twarnings\tmutations\treversed\tChain\tChain_sort\thVGene\thVGene_sort\thVGenePercIdentity\thJGene\thJGene_sort\thJGenePercIdentity\tigghNtSequence\tigghNtLength\tigghAaSequence\tigghAaLength\tfrh4Sequence\tfrh4Length\tcdrh3Sequence\tcdrh3Length\tfrh3Sequence\tfrh3Length\tcdrh2Sequence\tcdrh2Length\tfrh2Sequence\tfrh2Length\tcdrh1Sequence\tcdrh1Length\tfrh1Sequence\tfrh1Length\tchromatogram'
+        expected_header = 'id\tname\tname_sort\tdescription\tdescription_sort\tsequence\tlength\tannotations\tquality\tstatus\terrors\twarnings\tmutations\treversed\tChain\tChain_sort\thVGene\thVGene_sort\thVGenePercIdentity\thJGene\thJGene_sort\thJGenePercIdentity\tigghNtSequence\tigghNtLength\tigghAaSequence\tigghAaLength\tfrh4Sequence\tfrh4Length\tcdrh3Sequence\tcdrh3Length\tfrh3Sequence\tfrh3Length\tcdrh2Sequence\tcdrh2Length\tfrh2Sequence\tfrh2Length\tcdrh1Sequence\tcdrh1Length\tfrh1Sequence\tfrh1Length\tchromatogram'
         self.assertEqual(header, expected_header)
 
         first_line = lines[1]
-        expected_first_line = b'1\tP00863_C03\tP0000000863_C0000000003\tcrenezumab\tcrenezumab\tGAGGTGCAGCTGGTGGAGAGCGGCGGCGGCCTGGTGCAGCCCGGCGGCAGCCTGAGGCTGAGCTGCGCCGCCAGCGGCTTCACCTTCAGCAGCTACGGCATGAGCTGGGTGAGGCAGGCCCCCGGCAAGGGCCTGGAGCTGGTGGCCAGCATCAACAGCAACGGCGGCAGCACCTACTACCCCGACAGCGTGAAGGGCAGGTTCACCATCAGCAGGGACAACGCCAAGAACAGCCTGTACCTGCAGATGAACAGCCTGAGGGCCGAGGACACCGCCGTGTACTACTGCGCCAGCGGCGACTACTGGGGCCAGGGCACCACCGTGACCGTGAGCAGC\t336\ttype\\tstart\\tend\\tlabel\\nFR\\t1\\t75\\tFR-H1\\nFR\\t106\\t147\\tFR-H2\\nFR\\t178\\t294\\tFR-H3\\nFR\\t304\\t336\\tFR-H4\\ngene\\t2\\t291\\tIGHV3-2*01\\ngene\\t298\\t318\\tIGHJ4*01\\nMutation\\t1\\t3\\tQ1E\\nMutation\\t139\\t141\\tS47L\\nMutation\\t145\\t147\\tS49A\\nMutation\\t181\\t183\\tA61P\\nMutation\\t232\\t234\\tT78S\\nMutation\\t259\\t261\\tK87R\\nMutation\\t262\\t264\\tP88A\\nMutation\\t319\\t321\\tQ10T\\nCDR\\t76\\t105\\tCDR-H1\\nCDR\\t148\\t177\\tCDR-H2\\nCDR\\t295\\t303\\tCDR-H3\\nCDS\\t1\\t336\\tIgG-H\\nWarning\\t157\\t165\\tDeamidation\\n\t\tCORRECT\t\tDeamidation\tQ1E, S47L, S49A, A61P, T78S, K87R, P88A, Q10T\tfalse\tvh\tvh\tIGHV3-2*01\tIGHV0000000003-0000000002*0000000001\t76.207\tIGHJ4*01\tIGHJ0000000004*0000000001\t95.238\tGAGGTGCAGCTGGTGGAGAGCGGCGGCGGCCTGGTGCAGCCCGGCGGCAGCCTGAGGCTGAGCTGCGCCGCCAGCGGCTTCACCTTCAGCAGCTACGGCATGAGCTGGGTGAGGCAGGCCCCCGGCAAGGGCCTGGAGCTGGTGGCCAGCATCAACAGCAACGGCGGCAGCACCTACTACCCCGACAGCGTGAAGGGCAGGTTCACCATCAGCAGGGACAACGCCAAGAACAGCCTGTACCTGCAGATGAACAGCCTGAGGGCCGAGGACACCGCCGTGTACTACTGCGCCAGCGGCGACTACTGGGGCCAGGGCACCACCGTGACCGTGAGCAGC\t336\tEVQLVESGGGLVQPGGSLRLSCAASGFTFSSYGMSWVRQAPGKGLELVASINSNGGSTYYPDSVKGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCASGDYWGQGTTVTVSS\t112\tWGQGTTVTVSS\t11\tGDY\t3\tYPDSVKGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCAS\t39\tSINSNGGSTY\t10\tWVRQAPGKGLELVA\t14\tGFTFSSYGMS\t10\tEVQLVESGGGLVQPGGSLRLSCAAS\t25\t'
+        expected_first_line = '1\tP00863_C03\tP0000000863_C0000000003\tcrenezumab\tcrenezumab\tGAGGTGCAGCTGGTGGAGAGCGGCGGCGGCCTGGTGCAGCCCGGCGGCAGCCTGAGGCTGAGCTGCGCCGCCAGCGGCTTCACCTTCAGCAGCTACGGCATGAGCTGGGTGAGGCAGGCCCCCGGCAAGGGCCTGGAGCTGGTGGCCAGCATCAACAGCAACGGCGGCAGCACCTACTACCCCGACAGCGTGAAGGGCAGGTTCACCATCAGCAGGGACAACGCCAAGAACAGCCTGTACCTGCAGATGAACAGCCTGAGGGCCGAGGACACCGCCGTGTACTACTGCGCCAGCGGCGACTACTGGGGCCAGGGCACCACCGTGACCGTGAGCAGC\t336\ttype\\tstart\\tend\\tlabel\\nFR\\t1\\t75\\tFR-H1\\nFR\\t106\\t147\\tFR-H2\\nFR\\t178\\t294\\tFR-H3\\nFR\\t304\\t336\\tFR-H4\\ngene\\t2\\t291\\tIGHV3-2*01\\ngene\\t298\\t318\\tIGHJ4*01\\nMutation\\t1\\t3\\tQ1E\\nMutation\\t139\\t141\\tS47L\\nMutation\\t145\\t147\\tS49A\\nMutation\\t181\\t183\\tA61P\\nMutation\\t232\\t234\\tT78S\\nMutation\\t259\\t261\\tK87R\\nMutation\\t262\\t264\\tP88A\\nMutation\\t319\\t321\\tQ10T\\nCDR\\t76\\t105\\tCDR-H1\\nCDR\\t148\\t177\\tCDR-H2\\nCDR\\t295\\t303\\tCDR-H3\\nCDS\\t1\\t336\\tIgG-H\\nWarning\\t157\\t165\\tDeamidation\\n\t\tCORRECT\t\tDeamidation\tQ1E, S47L, S49A, A61P, T78S, K87R, P88A, Q10T\tfalse\tvh\tvh\tIGHV3-2*01\tIGHV0000000003-0000000002*0000000001\t76.207\tIGHJ4*01\tIGHJ0000000004*0000000001\t95.238\tGAGGTGCAGCTGGTGGAGAGCGGCGGCGGCCTGGTGCAGCCCGGCGGCAGCCTGAGGCTGAGCTGCGCCGCCAGCGGCTTCACCTTCAGCAGCTACGGCATGAGCTGGGTGAGGCAGGCCCCCGGCAAGGGCCTGGAGCTGGTGGCCAGCATCAACAGCAACGGCGGCAGCACCTACTACCCCGACAGCGTGAAGGGCAGGTTCACCATCAGCAGGGACAACGCCAAGAACAGCCTGTACCTGCAGATGAACAGCCTGAGGGCCGAGGACACCGCCGTGTACTACTGCGCCAGCGGCGACTACTGGGGCCAGGGCACCACCGTGACCGTGAGCAGC\t336\tEVQLVESGGGLVQPGGSLRLSCAASGFTFSSYGMSWVRQAPGKGLELVASINSNGGSTYYPDSVKGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCASGDYWGQGTTVTVSS\t112\tWGQGTTVTVSS\t11\tGDY\t3\tYPDSVKGRFTISRDNAKNSLYLQMNSLRAEDTAVYYCAS\t39\tSINSNGGSTY\t10\tWVRQAPGKGLELVA\t14\tGFTFSSYGMS\t10\tEVQLVESGGGLVQPGGSLRLSCAAS\t25\t'
         self.assertEqual(first_line, expected_first_line)
 
     def test_example_02b_downloads_to_memory(self):
@@ -132,8 +129,8 @@ ORIGIN
         Download the original, un-parsed file from PipeBio.
         e.g. this is the file the user originally uploaded, byte for byte.
         """
-        destination_filename = '/tmp/output.fsa'
-        example_02d_download_original_file(296713, destination_filename)
+        destination_filename = 'output.fsa'
+        absolute_location = example_02d_download_original_file(296713, destination_filename)
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, './sample_data/adimab/137_adimab_VH.fsa')
@@ -141,7 +138,7 @@ ORIGIN
         with open(filename, 'rt') as expected_handle:
             expected = expected_handle.read()
 
-            with open(destination_filename, 'rt') as reference:
+            with open(absolute_location, 'rt') as reference:
                 actual = reference.read()
 
                 # The downloaded original file should exactly match the version on disk that we started with.
@@ -166,4 +163,8 @@ ORIGIN
 
     def unzip(self, input_path: str) -> str:
         with gzip.open(input_path, 'rb') as f:
+            return f.read()
+
+    def read(self, input_path: str) -> str:
+        with open(input_path, 'rt') as f:
             return f.read()

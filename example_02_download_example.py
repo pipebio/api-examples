@@ -79,12 +79,12 @@ def example_02c_download_result_to_biological_format(document_id):
     print('\nLogged in as {}. \n'.format(user['firstName'], user['lastName']))
 
     # Specify a target folder on this computer to download the file to.
-    destination_folder = "/Users/owen/Documents/api-examples/Downloads"
+    destination_folder = Util.get_executed_file_location()
 
     return client.export(document_id, ExportFormat.GENBANK.value, destination_folder)
 
 
-def example_02d_download_original_file(document_id: int, destination_filename: str = None):
+def example_02d_download_original_file(document_id: int, destination_filename: str = None) -> str:
     """
     Download the original, un-parsed file.
    """
@@ -101,7 +101,7 @@ def example_02d_download_original_file(document_id: int, destination_filename: s
     # Set the download name and folder.
     destination_filename = "download.tsv" if destination_filename is None else destination_filename
     destination_location = Util.get_executed_file_location()
-    absolute_location = os.path.join(destination_location, f'/../Downloads/{destination_filename}')
+    absolute_location = os.path.join(destination_location, f'../Downloads/{destination_filename}')
 
     return client.entities.download_original_file(document_id, absolute_location)
 

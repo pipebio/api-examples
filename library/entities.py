@@ -122,7 +122,7 @@ class Entities:
 
         return columns
 
-    def download_original_file(self, entity_id: int, destination_filename: str) -> None:
+    def download_original_file(self, entity_id: int, destination_filename: str) -> str:
         """
         Download the originally uploaded file corresponding to a PipeBio document.
         Two requests are made:
@@ -150,3 +150,5 @@ class Entities:
         with open(destination_filename, 'wb') as f:
             for chunk in download_response.iter_content(chunk_size=8192):
                 f.write(chunk)
+
+        return destination_filename

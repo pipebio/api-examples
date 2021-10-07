@@ -30,30 +30,9 @@ class Sequences:
         entities = {}
 
         def download(entity_id: int) -> None:
-            entities[entity_id] = self.download(entity_id)
+            entities[entity_id] = self.download(entity_id, Sequences.get_filepath_for_entity_id(entity_id))
 
         list(ThreadPool(8).imap_unordered(download, entity_ids))
-
-        for entity_id in entity_ids:
-            file_shard_list = entities[entity_id]
-
-            print('Unzipping: ' + str(entity_id))
-            file_location = Sequences.get_filepath_for_entity_id(entity_id)
-            print('file_location', file_location)
-
-            skip_first = False
-
-            with open(file_location, 'wb+') as target_file:
-                for file_shard in file_shard_list:
-                    with gzip.open(file_shard, 'rb') as g_zip_file:
-                        first_line = True
-                        for line in g_zip_file:
-                            # We skip the first line of every file, except for the very first.
-                            if not (first_line and skip_first):
-                                target_file.write(line)
-                            first_line = False
-                    # We skip the first line of every file, except for the very first.
-                    skip_first = True
 
     def download_to_memory(self, entity_ids: List[int]):
         self.parallel_download(entity_ids)
@@ -69,10 +48,10 @@ class Sequences:
             Column('type', TableColumnType.STRING),
         ]
 
-        for bigquery_id in entity_ids:
+        for entity_id in entity_ids:
             sequence_map = self.read_tsv_to_map(
-                Sequences.get_filepath_for_entity_id(bigquery_id),
-                str(bigquery_id),
+                Sequences.get_filepath_for_entity_id(entity_id),
+                str(entity_id),
                 columns,
                 sequence_map
             )
@@ -111,13 +90,9 @@ class Sequences:
 
         return sequence_map
 
-    def download(self, entity_id: int, destination: str = None, sort: List[Sort] = None) -> None:
+    def download(self, entity_id: int, destination: str = None, sort: List[Sort] = None) -> str:
         """
         Download sequences from a single entity.
-
-        :param entity_id:
-        :param destination:
-        :return: array of paths to downloaded files.
         """
 
         sort = [Sort('id', 'asc')] if sort is None else sort
@@ -168,6 +143,8 @@ class Sequences:
                         first_line = False
                 # We skip the first line of every file, except for the very first.
                 skip_first = True
+
+        return destination
 
     @staticmethod
     def sanitize(line: str) -> str:
