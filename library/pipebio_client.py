@@ -1,10 +1,9 @@
 import os
-from typing import Dict, Any, Union
+from typing import Any
 from urllib.request import URLopener
 
 from requests.sessions import Session
 
-from library.authentication import Authentication
 from library.entities import Entities
 from library.jobs import Jobs
 from library.models.export_format import ExportFormat
@@ -15,30 +14,35 @@ from library.shareables import Shareables
 
 class PipebioClient:
     _session: Session
-    authentication: Authentication
     shareables: Shareables
     entities: Entities
     jobs: Jobs
     sequences: Sequences
+    user: Any
 
     def __init__(self):
         self._session = Session()
+        api_key = os.environ['PIPE_API_KEY'] if 'PIPE_API_KEY' in os.environ else None
+        if api_key is None:
+            print('PIPE_API_KEY required.')
+            print(f'PIPE_EMAIL={api_key}')
+            quit()
+
+        # Set Bearer token header with API KEY
+        self._session.headers.update({"Authorization": f"Bearer {api_key}"})
+
         base_url = 'https://app.pipebio.com'
-        self.authentication = Authentication(base_url)
         self.shareables = Shareables(base_url, self._session)
         self.entities = Entities(base_url, self._session)
         self.jobs = Jobs(base_url, self._session)
         self.sequences = Sequences(base_url, self._session)
+        self.user = self.get_user(base_url)
 
-    def login(self, email: str = None, password: str = None, token: str = None) -> None:
-        """
-        Login with arguments or by specifying environment variables.
-        """
-        response = self.authentication.login(email, password, token)
-
-        response_session = response['session']
-        self._session.__dict__.update(response_session.__dict__)
-        self._user = response['user']
+    def get_user(self, base_url: str):
+        url = f'{base_url}/api/v2/me'
+        response = self._session.get(url)
+        user = response.json()
+        return user
 
     def upload_file(self,
                     file_name: str,
@@ -69,7 +73,7 @@ class PipebioClient:
                destination_folder: str = None):
         entity = self.entities.get(entity_id)
         entity_name = entity['name']
-        user = self.authentication.user
+        user = self.user
 
         path_parts = entity['path'].split('.')
         # Last path part is always the current document.

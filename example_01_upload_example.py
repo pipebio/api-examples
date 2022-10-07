@@ -21,13 +21,9 @@ def example_01_upload_example():
 
     client = PipebioClient()
 
-    # Either login with hardcoded variables or use environment variables.
-    # PIPE_EMAIL=<my-email> PIPE_PASSWORD=<my-password> PIPE_TOKEN=<my-token> python login.py
-    client.login()
-
-    # Display who we are logged in as.
-    user = client.authentication.user
-    print('\nLogged in as {}. \n'.format(user['firstName'], user['lastName']))
+    # Display api key user details.
+    user = client.user
+    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
 
     # Get a list of all available projects for the user's organization.
     projects = client.shareables.list()
