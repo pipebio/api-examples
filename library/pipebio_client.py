@@ -25,7 +25,7 @@ class PipebioClient:
         api_key = os.environ['PIPE_API_KEY'] if 'PIPE_API_KEY' in os.environ else None
         if api_key is None:
             print('PIPE_API_KEY required.')
-            print(f'PIPE_EMAIL={api_key}')
+            print(f'PIPE_API_KEY={api_key}')
             quit()
 
         # Set Bearer token header with API KEY
