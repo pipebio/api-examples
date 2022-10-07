@@ -79,7 +79,7 @@ def example_02c_download_result_to_biological_format(document_id):
     print('\nLogged in as {}. \n'.format(user['firstName'], user['lastName']))
 
     # Specify a target folder on this computer to download the file to.
-    destination_folder = Util.get_executed_file_location()
+    destination_folder = os.path.join(Util.get_executed_file_location(), '..', f'Downloads')
 
     return client.export(document_id, ExportFormat.GENBANK.value, destination_folder)
 
