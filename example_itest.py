@@ -3,7 +3,7 @@ import os
 import re
 import unittest
 
-from example_01_upload_example import example_01_upload_example
+from example_01_upload_example import example_01a_upload_example_fasta, example_01b_upload_example_tsv
 from example_02_download_example import example_02a_download_result_as_tsv, \
     example_02b_download_result_to_memory_to_do_more_work, example_02c_download_result_to_biological_format, \
     example_02d_download_original_file
@@ -12,11 +12,11 @@ from example_03_cluster_example import example_03_cluster_example
 
 class ExampleE2ETests(unittest.TestCase):
 
-    def test_example_01_uploads_an_example_file(self):
+    def test_example_01a_uploads_an_example_fasta_file(self):
         """
         Upload a file on disk to PipeBio
         """
-        job = example_01_upload_example()
+        job = example_01a_upload_example_fasta()
 
         # Make some basic assertions to ensure the job ran to completion.
         self.assertEqual(job['type'], 'ImportJob')
@@ -26,6 +26,10 @@ class ExampleE2ETests(unittest.TestCase):
         # You might like to do something with this document id, such as run a QC or Annotation job on it.
         output_entities = job['outputEntities']
         print('Result document id & name: ', str(output_entities[0]))
+
+    def test_example_01b_upload_example_tsv_file(self):
+        entity = example_01b_upload_example_tsv()
+        print(f'Created document id: {entity.id}')
 
     def test_example_02a_downloads_to_tsv(self):
         """
