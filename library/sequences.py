@@ -2,7 +2,11 @@ import csv
 import gzip
 import os
 import tempfile
+import time
+import traceback
 from multiprocessing.pool import ThreadPool
+from pathlib import Path
+from subprocess import check_call
 from typing import List, Dict
 from urllib.request import URLopener
 
@@ -223,3 +227,107 @@ class Sequences:
                                               reverse=column_to_sort.sort == 'desc')
 
         return list(map(lambda x: x['file_shard'], sorted_shard_first_lines))
+
+    def create_signed_upload(self, entity_id: int, retries=5):
+        try:
+            response = self.session.post('{}/sequences/signed-upload/{}'.format(self.url, entity_id))
+            print('create_signed_upload: response.text', response.text)
+            print('create_signed_upload: response.status', response.status_code)
+            return response.json()
+        except Exception as error:
+            print('create_signed_upload:error: ', error)
+            traceback.print_exc()
+            if retries > 0:
+                print('create_signed_upload:error, retrying', retries)
+                time.sleep(5)
+                return self.create_signed_upload(entity_id, retries - 1)
+            else:
+                raise error
+
+    @staticmethod
+    def maybe_compress_file(file_path) -> str:
+        key = 'COMPRESS_BIGQUERY_UPLOADS'
+        if key in os.environ:
+            # Intentional string comparison, environment variables are always strings.
+            should_compress = os.environ[key] == 'true'
+            print('environment variable "{}"="{}"'.format(key, should_compress))
+            if should_compress:
+                print('Original size:{} '.format(Path(file_path).stat().st_size))
+                check_call(['gzip', file_path])
+                zipped_file_path = file_path + '.gz'
+                print('Gzipped size:{} '.format(Path(zipped_file_path).stat().st_size))
+                return zipped_file_path
+            else:
+                pass
+        else:
+            print('environment variable "{}" not set. Not compressing.'.format(key))
+        return file_path
+
+    def upload(self, url: str, file_path: str, retries=5):
+        if retries == 0:
+            raise Exception('Upload has timed out.')
+
+        zipped_file_path = self.maybe_compress_file(file_path)
+        with open(zipped_file_path, 'rb') as f:
+            try:
+                print('upload starting')
+                print('remaining retries={}, uploading to:{}'.format(retries, url))
+                response = requests.put(url, data=f, timeout=10 * 60)
+                print('upload: response.text', response.text)
+                print('upload: response.status', response.status_code)
+                print('upload:ok')
+            except requests.exceptions.ConnectionError as e:
+                track = traceback.format_exc()
+                print(track)
+                # RECURSION !!!!
+                self.upload(url, file_path, retries - 1)
+
+    def import_signed_upload(self, import_details: Dict, retries=5) -> bool:
+        # Need a nice big sleep to avoid hitting rate limits.
+        # Multiplying by retry count gives a nicely increasing delay.
+        sleep_seconds = 10 * (6 - retries)
+
+        try:
+            print('import_signed_upload starting.')
+            response = self.session.post('{}/sequences/import-signed-upload'.format(self.url),
+                                         json=import_details,
+                                         timeout=10 * 60)
+            response_json = response.json()
+            print('import_signed_upload:ok, status={}'.format(response_json))
+            print('import_signed_upload: response.status', response.status_code)
+
+            if response_json['state'] == 'SUCCESS':
+                return True
+            elif response_json['state'] == 'UNSPECIFIED':
+
+                errors: List[str] = response_json['errors']
+                print('any errors:', response_json['errors'])
+
+                for error in errors:
+                    if error.startswith('Exceeded rate limits') and retries > 0:
+
+                        time.sleep(sleep_seconds)
+                        # RECURSION!!!
+                        return self.import_signed_upload(import_details, retries - 1)
+                    else:
+                        raise ImportError('import_signed_upload:error')
+
+                time.sleep(sleep_seconds)
+                # RECURSION!!!
+                return self.import_signed_upload(import_details, retries - 1)
+            else:
+                # They're pending, so just poll again
+                time.sleep(sleep_seconds)
+                # RECURSION!!!
+                return self.import_signed_upload(import_details, retries - 1)
+        except ImportError as error:
+            raise error
+        except Exception as error:
+            print('import_signed_upload:error: ', error)
+
+            time.sleep(sleep_seconds)
+            if retries > 0:
+                # RECURSION!!!
+                return self.import_signed_upload(import_details, retries - 1)
+            else:
+                raise error

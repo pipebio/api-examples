@@ -1,11 +1,14 @@
 import inspect
 import logging
 import os
+from Bio.Seq import translate
 
 import requests
 from requests import HTTPError
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
+
+from library.models.sequence_document_kind import SequenceDocumentKind
 
 DEFAULT_TIMEOUT = 60  # seconds
 
@@ -70,3 +73,12 @@ class Util:
         # @see https://stackoverflow.com/a/44592299
         filename = inspect.getframeinfo(inspect.currentframe()).filename
         return os.path.dirname(os.path.abspath(filename))
+
+    @staticmethod
+    def get_sequence_kind(sequence: str) -> SequenceDocumentKind:
+        try:
+            not_an_alignment = sequence.replace('-', '')
+            translate(not_an_alignment)
+            return SequenceDocumentKind.DNA
+        except:
+            return SequenceDocumentKind.AA

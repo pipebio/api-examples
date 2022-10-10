@@ -1,8 +1,9 @@
 import traceback
 from distutils.util import strtobool
-from typing import Optional, List
+from typing import Optional, List, Union
 
 from library.models.table_column_type import TableColumnType
+from library.models.table_column_utils import table_column_type_to_numpy_type
 
 
 class Column(dict):
@@ -13,6 +14,7 @@ class Column(dict):
     def __init__(self, header: str, type: TableColumnType, description: str = None, no_sort=False):
         super().__init__()
         self.name = header
+        self.kind = type
         self.type = type
         self.description = description
         # Don't use natural sort.
@@ -23,7 +25,7 @@ class Column(dict):
 
     def get_as_numpy(self) -> dict:
         return {
-            self.name: self.type.to_numpy(),
+            self.name: table_column_type_to_numpy_type(self.kind),
         }
 
     @staticmethod
@@ -110,6 +112,24 @@ class NumberColumn(Column):
     def __init__(self, header: str, description: str = None, no_sort=False):
         super().__init__(header, TableColumnType.NUMERIC, description, no_sort)
 
+    @staticmethod
+    def write_for_db(value: Union[float, str]) -> str:
+        """
+        Writes in a value so it can be parsed.
+        """
+        if value == '' or value is None:
+            # str(round(float(value), 9)) fails for empty strings.
+            return ''
+
+        else:
+            try:
+                # 9 is the maximum number of decimal places allowed.
+                return str(round(float(value), 9))
+            except Exception as e:
+                print('write_for_db error "{}"'.format(value))
+                print(e)
+                raise e
+
 
 class ConstantColumn(Column):
     value: any
@@ -118,3 +138,19 @@ class ConstantColumn(Column):
         super().__init__(header, type, description, no_sort)
 
         self.value = value
+
+
+def take_uniques(maybe_with_dupes: List[any]) -> List[any]:
+    '''
+    Like doing set(columns) but has the benefit of preserving order.
+    Uses the hash on an object for comparison.
+    '''
+    result = []
+    uniques = set()
+
+    for column in maybe_with_dupes:
+        if column not in uniques:
+            uniques.add(column)
+            result.append(column)
+
+    return result

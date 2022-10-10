@@ -20,16 +20,9 @@ def example_02a_download_result_as_tsv(document_id: int):
     """
     client = PipebioClient()
 
-    # Either login with hardcoded variables or use environment variables:
-    # e.g.
-    #       client.login(<my-email>, <my-password>, <my-token>)
-    #   or:
-    #       PIPE_EMAIL=<my-email> PIPE_PASSWORD=<my-password> PIPE_TOKEN=<my-token> python login.py
-    client.login()
-
-    # Display who we are logged in as.
-    user = client.authentication.user
-    print('\nLogged in as {}. \n'.format(user['firstName'], user['lastName']))
+    # Display api key user details.
+    user = client.user
+    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
 
     # Set the download name and folder.
     destination_filename = "download.tsv"
@@ -47,16 +40,9 @@ def example_02b_download_result_to_memory_to_do_more_work(document_id: int):
     """
     client = PipebioClient()
 
-    # Either login with hardcoded variables or use environment variables:
-    # e.g.
-    #       client.login(<my-email>, <my-password>, <my-token>)
-    #   or:
-    #       PIPE_EMAIL=<my-email> PIPE_PASSWORD=<my-password> PIPE_TOKEN=<my-token> python login.py
-    client.login()
-
-    # Display who we are logged in as.
-    user = client.authentication.user
-    print('\nLogged in as {}. \n'.format(user['firstName'], user['lastName']))
+    # Display api key user details.
+    user = client.user
+    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
 
     return client.sequences.download_to_memory([document_id])
 
@@ -67,19 +53,12 @@ def example_02c_download_result_to_biological_format(document_id):
     """
     client = PipebioClient()
 
-    # Either login with hardcoded variables or use environment variables:
-    # e.g.
-    #       client.login(<my-email>, <my-password>, <my-token>)
-    #   or:
-    #       PIPE_EMAIL=<my-email> PIPE_PASSWORD=<my-password> PIPE_TOKEN=<my-token> python login.py
-    client.login()
-
-    # Display who we are logged in as.
-    user = client.authentication.user
-    print('\nLogged in as {}. \n'.format(user['firstName'], user['lastName']))
+    # Display api key user details.
+    user = client.user
+    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
 
     # Specify a target folder on this computer to download the file to.
-    destination_folder = Util.get_executed_file_location()
+    destination_folder = os.path.join(Util.get_executed_file_location(), '..', f'Downloads')
 
     return client.export(document_id, ExportFormat.GENBANK.value, destination_folder)
 
@@ -90,13 +69,9 @@ def example_02d_download_original_file(document_id: int, destination_filename: s
    """
     client = PipebioClient()
 
-    # Either login with hardcoded variables or use environment variables.
-    # PIPE_EMAIL=<my-email> PIPE_PASSWORD=<my-password> PIPE_TOKEN=<my-token> python login.py
-    client.login()
-
-    # Display who we are logged in as.
-    user = client.authentication.user
-    print('\nLogged in as {}. \n'.format(user['firstName'], user['lastName']))
+    # Display api key user details.
+    user = client.user
+    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
 
     # Set the download name and folder.
     destination_filename = "download.tsv" if destination_filename is None else destination_filename
