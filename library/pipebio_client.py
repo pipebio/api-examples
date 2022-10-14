@@ -24,9 +24,8 @@ class PipebioClient:
         self._session = Session()
         api_key = os.environ['PIPE_API_KEY'] if 'PIPE_API_KEY' in os.environ else None
         if api_key is None:
-            print('PIPE_API_KEY required.')
             print(f'PIPE_API_KEY={api_key}')
-            quit()
+            raise Exception('PIPE_API_KEY required.')
 
         # Set Bearer token header with API KEY
         self._session.headers.update({"Authorization": f"Bearer {api_key}"})
