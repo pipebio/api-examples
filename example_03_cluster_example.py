@@ -26,15 +26,13 @@ def example_03_cluster_example(sequence_document_id: int, target_folder_id: int 
     # Find a specific project having a name "Example".
     example_project = next((project for project in projects if project['name'] == project_name), None)
     if example_project is None:
-        print(f'Error: Example project named {project_name} not found')
-        quit()
+        raise Exception(f'Error: Example project named {project_name} not found')
 
     # Find a specific document with an id "22333"
     entities = client.shareables.list_entities(example_project['id'])
     annotated_doc = next((entity for entity in entities if entity['id'] == str(sequence_document_id)), None)
     if annotated_doc is None:
-        print('Error: annotated_doc not found')
-        quit()
+        raise Exception('Error: annotated_doc not found')
 
     # Run a cluster job on that document.
     organization_id = user['orgs'][0]['id']
