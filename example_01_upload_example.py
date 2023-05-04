@@ -39,8 +39,7 @@ def example_01a_upload_example_fasta():
     # Find a specific project having a name "Example".
     example_project = next((project for project in projects if project['name'] == project_name), None)
     if example_project is None:
-        print(f'Error: Example project named "{project_name}" not found')
-        quit()
+        raise Exception(f'Error: Example project named "{project_name}" not found')
 
     # Upload a sample file to the
     file_name = '137_adimab_VL.fsa'
@@ -77,8 +76,7 @@ def example_01b_upload_example_tsv():
     # Find a specific project having a name "Example".
     example_project = next((project for project in projects if project['name'] == project_name), None)
     if example_project is None:
-        print(f'Error: Example project named "{project_name}" not found')
-        quit()
+        raise Exception(f'Error: Example project named "{project_name}" not found')
 
     # Upload a sample file to the
     file_name = 'upload.tsv'
