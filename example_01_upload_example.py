@@ -1,14 +1,14 @@
 import csv
 import os
+import sys
 
-from library.column import Column
-from library.models import EntityTypes
-from library.models.sequence_document_kind import SequenceDocumentKind
-from library.models.table_column_type import TableColumnType
-from library.models.upload_summary import UploadSummary
-from library.pipebio_client import PipebioClient
-from library.uploader import Uploader
-from library.util import Util
+from pipebio.column import Column
+from pipebio.models.entity_types import EntityTypes
+from pipebio.models.sequence_document_kind import SequenceDocumentKind
+from pipebio.models.table_column_type import TableColumnType
+from pipebio.models.upload_summary import UploadSummary
+from pipebio.pipebio_client import PipebioClient
+from pipebio.uploader import Uploader
 
 
 def example_01a_upload_example_fasta():
@@ -31,7 +31,7 @@ def example_01a_upload_example_fasta():
 
     # Display api key user details.
     user = client.user
-    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
+    print('\nUsing api key for {} {}. \n'.format(user['firstName'], user['lastName']))
 
     # Get a list of all available projects for the user's organization.
     projects = client.shareables.list()
@@ -44,7 +44,9 @@ def example_01a_upload_example_fasta():
 
     # Upload a sample file to the
     file_name = '137_adimab_VL.fsa'
-    file_path = os.path.join(Util.get_executed_file_location(), '../sample_data/adimab/{}'.format(file_name))
+    file_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'sample_data/adimab/{}'.format(file_name))
+
+    print(f"Uploading: {file_path}")
 
     return client.upload_file(
         file_name=file_name,
@@ -69,7 +71,7 @@ def example_01b_upload_example_tsv():
 
     # Display api key user details.
     user = client.user
-    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
+    print('\nUsing api key for {} {}. \n'.format(user['firstName'], user['lastName']))
 
     # Get a list of all available projects for the user's organization.
     projects = client.shareables.list()
@@ -82,7 +84,8 @@ def example_01b_upload_example_tsv():
 
     # Upload a sample file to the
     file_name = 'upload.tsv'
-    file_path = os.path.join(Util.get_executed_file_location(), '../sample_data/{}'.format(file_name))
+    file_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'sample_data/{}'.format(file_name))
+    print(f"Uploading: {file_path}")
 
     # First create the entity
     new_entity = client.entities.create_file(
@@ -126,3 +129,4 @@ def example_01b_upload_example_tsv():
 
 if __name__ == "__main__":
     example_01a_upload_example_fasta()
+    example_01b_upload_example_tsv()
