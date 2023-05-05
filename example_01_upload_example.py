@@ -1,6 +1,7 @@
 import csv
 import os
-import sys
+from inspect import getsourcefile
+from os.path import dirname
 
 from pipebio.column import Column
 from pipebio.models.entity_types import EntityTypes
@@ -44,7 +45,8 @@ def example_01a_upload_example_fasta():
 
     # Upload a sample file to the
     file_name = '137_adimab_VL.fsa'
-    file_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'sample_data/adimab/{}'.format(file_name))
+    current_dir = dirname(getsourcefile(lambda: 0))
+    file_path = os.path.join(current_dir, 'sample_data/adimab/{}'.format(file_name))
 
     print(f"Uploading: {file_path}")
 
@@ -84,7 +86,8 @@ def example_01b_upload_example_tsv():
 
     # Upload a sample file to the
     file_name = 'upload.tsv'
-    file_path = os.path.join(os.path.dirname(os.path.abspath(sys.argv[0])), 'sample_data/{}'.format(file_name))
+    current_dir = dirname(getsourcefile(lambda: 0))
+    file_path = os.path.join(current_dir, 'sample_data/{}'.format(file_name))
     print(f"Uploading: {file_path}")
 
     # First create the entity

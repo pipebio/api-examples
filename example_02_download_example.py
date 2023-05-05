@@ -1,4 +1,5 @@
 import os
+import tempfile
 
 from pipebio.models.export_format import ExportFormat
 from pipebio.pipebio_client import PipebioClient
@@ -84,14 +85,14 @@ def example_02d_download_original_file(document_id: int, destination_filename: s
 
 if __name__ == "__main__":
     # Downloads the document as a tsv and prints the file location
-    example_02a_download_result_as_tsv(1063911, '1063911_download', '/Users/Chris/temp')
+    example_02a_download_result_as_tsv(1063911, '1063911_download', tempfile.gettempdir())
 
     # Prints document content
     print(example_02b_download_result_to_memory_to_do_more_work(1063911))
 
     # Downloads the file in biological format and prints the file location
-    print(example_02c_download_result_to_biological_format(1063911, '/Users/Chris/temp'))
+    print(example_02c_download_result_to_biological_format(1063911, tempfile.gettempdir()))
 
     # Downloads the original file and prints the file location
-    print(example_02d_download_original_file(1063895, '1063911_original', '/Users/Chris/temp'))
+    print(example_02d_download_original_file(1063895, '1063911_original', tempfile.gettempdir()))
 
