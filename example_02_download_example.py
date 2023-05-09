@@ -85,14 +85,14 @@ def example_02d_download_original_file(document_id: int, destination_filename: s
 
 if __name__ == "__main__":
     # Downloads the document as a tsv and prints the file location
-    example_02a_download_result_as_tsv(1063911, '1063911_download', tempfile.gettempdir())
+    example_02a_download_result_as_tsv(296716, '296716_download', tempfile.gettempdir())
 
     # Prints document content
-    print(example_02b_download_result_to_memory_to_do_more_work(1063911))
+    print(example_02b_download_result_to_memory_to_do_more_work(296717))
 
     # Downloads the file in biological format and prints the file location
-    print(example_02c_download_result_to_biological_format(1063911, tempfile.gettempdir()))
+    print(example_02c_download_result_to_biological_format(296717, tempfile.gettempdir()))
 
     # Downloads the original file and prints the file location
-    print(example_02d_download_original_file(1063895, '1063911_original', tempfile.gettempdir()))
+    print(example_02d_download_original_file(296713, '1063911_original', tempfile.gettempdir()))
 
