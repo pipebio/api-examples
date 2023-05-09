@@ -1,1 +1,1 @@
-# pipebio==0.1.4
+pipebio==1.0.0
