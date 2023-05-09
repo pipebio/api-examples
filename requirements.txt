@@ -1,1 +1,3 @@
 pipebio==1.0.0
+pytest~=6.2.5
+setuptools~=62.1.0
