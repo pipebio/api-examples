@@ -1,8 +1,9 @@
 import os
+import tempfile
 
-from library.models.export_format import ExportFormat
-from library.pipebio_client import PipebioClient
-from library.util import Util
+from pipebio.models.export_format import ExportFormat
+from pipebio.pipebio_client import PipebioClient
+from pipebio.util import Util
 
 
 def get_sequence_id():
@@ -14,7 +15,7 @@ def get_sequence_id():
         return int(sequence_document_id)
 
 
-def example_02a_download_result_as_tsv(document_id: int):
+def example_02a_download_result_as_tsv(document_id: int, destination_filename: str = None, destination_location: str = None):
     """
     Download the raw file as a TSV.
     """
@@ -22,12 +23,12 @@ def example_02a_download_result_as_tsv(document_id: int):
 
     # Display api key user details.
     user = client.user
-    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
+    print('\nUsing api key for {} {}. \n'.format(user['firstName'], user['lastName']))
 
     # Set the download name and folder.
-    destination_filename = "download.tsv"
-    destination_location = Util.get_executed_file_location()
-    absolute_location = os.path.join(destination_location, '..', f'Downloads/{destination_filename}')
+    destination_filename = "download.tsv" if destination_filename is None else destination_filename
+    destination_location = Util.get_executed_file_location() if destination_location is None else destination_location
+    absolute_location = os.path.join(destination_location, destination_filename)
 
     client.sequences.download(document_id, destination=absolute_location)
 
@@ -42,12 +43,12 @@ def example_02b_download_result_to_memory_to_do_more_work(document_id: int):
 
     # Display api key user details.
     user = client.user
-    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
+    print('\nUsing api key for {} {}. \n'.format(user['firstName'], user['lastName']))
 
     return client.sequences.download_to_memory([document_id])
 
 
-def example_02c_download_result_to_biological_format(document_id):
+def example_02c_download_result_to_biological_format(document_id, destination_location: str = None):
     """
     Download the format in Genbank, Fasta, Fastq, Ab1 etc.
     """
@@ -55,15 +56,15 @@ def example_02c_download_result_to_biological_format(document_id):
 
     # Display api key user details.
     user = client.user
-    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
+    print('\nUsing api key for {} {}. \n'.format(user['firstName'], user['lastName']))
 
     # Specify a target folder on this computer to download the file to.
-    destination_folder = os.path.join(Util.get_executed_file_location(), '..', f'Downloads')
+    destination_location = Util.get_executed_file_location() if destination_location is None else destination_location
 
-    return client.export(document_id, ExportFormat.GENBANK.value, destination_folder)
+    return client.export(document_id, ExportFormat.GENBANK.value, destination_location)
 
 
-def example_02d_download_original_file(document_id: int, destination_filename: str = None) -> str:
+def example_02d_download_original_file(document_id: int, destination_filename: str = None, destination_location: str = None) -> str:
     """
     Download the original, un-parsed file.
    """
@@ -71,15 +72,27 @@ def example_02d_download_original_file(document_id: int, destination_filename: s
 
     # Display api key user details.
     user = client.user
-    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
+    print('\nUsing api key for {} {}. \n'.format(user['firstName'], user['lastName']))
 
     # Set the download name and folder.
     destination_filename = "download.tsv" if destination_filename is None else destination_filename
-    destination_location = Util.get_executed_file_location()
-    absolute_location = os.path.join(destination_location, f'../Downloads/{destination_filename}')
+    # Specify a target folder on this computer to download the file to.
+    destination_location = Util.get_executed_file_location() if destination_location is None else destination_location
+    absolute_location = os.path.join(destination_location, destination_filename)
 
     return client.entities.download_original_file(document_id, absolute_location)
 
 
 if __name__ == "__main__":
-    example_02a_download_result_as_tsv(298154)
+    # Downloads the document as a tsv and prints the file location
+    example_02a_download_result_as_tsv(296716, '296716_download', tempfile.gettempdir())
+
+    # Prints document content
+    print(example_02b_download_result_to_memory_to_do_more_work(296717))
+
+    # Downloads the file in biological format and prints the file location
+    print(example_02c_download_result_to_biological_format(296717, tempfile.gettempdir()))
+
+    # Downloads the original file and prints the file location
+    print(example_02d_download_original_file(296713, '1063911_original', tempfile.gettempdir()))
+

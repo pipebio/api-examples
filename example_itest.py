@@ -2,6 +2,7 @@ import gzip
 import os
 import re
 import unittest
+import tempfile
 
 from example_01_upload_example import example_01a_upload_example_fasta, example_01b_upload_example_tsv
 from example_02_download_example import example_02a_download_result_as_tsv, \
@@ -35,7 +36,7 @@ class ExampleE2ETests(unittest.TestCase):
         """
         Download a PipeBio file to disk in raw tsv format.
         """
-        result = example_02a_download_result_as_tsv(296716)
+        result = example_02a_download_result_as_tsv(296716, '296716_download', tempfile.gettempdir())
 
         contents = self.read(result)
         lines = contents.split('\n')
@@ -66,53 +67,74 @@ class ExampleE2ETests(unittest.TestCase):
         """
         Download a PipeBio file and specify the result format. In this case we choose Genbank format.
         """
-        result = example_02c_download_result_to_biological_format(296717)
+        result = example_02c_download_result_to_biological_format(296717, tempfile.gettempdir())
         # NOTE: The date is intentionally modified below so that our tests will pass, even as time marches on.
         expected_genbank = '''
 LOCUS       P00863_C03               112 aa                     UNK XX-XXX-XXXX
-DEFINITION  crenezumab.
-ACCESSION   1
-VERSION     1
+DEFINITION  .
+ACCESSION   P00863_C03
+VERSION     P00863_C03
 KEYWORDS    .
 SOURCE      .
   ORGANISM  .
             .
 FEATURES             Location/Qualifiers
      FR              1..25
+                     /name="FR-H1"
                      /label="FR-H1"
      FR              36..49
+                     /name="FR-H2"
                      /label="FR-H2"
      FR              60..98
+                     /name="FR-H3"
                      /label="FR-H3"
      FR              102..112
+                     /name="FR-H4"
                      /label="FR-H4"
      gene            1..97
+                     /name="IGHV3-2*01"
                      /label="IGHV3-2*01"
      gene            100..106
+                     /name="IGHJ4*01"
                      /label="IGHJ4*01"
+     Mutation        1
+                     /name="Q1E"
+                     /label="Q1E"
      Mutation        47
+                     /name="S47L"
                      /label="S47L"
      Mutation        49
+                     /name="S49A"
                      /label="S49A"
      Mutation        61
+                     /name="A61P"
                      /label="A61P"
      Mutation        78
+                     /name="T78S"
                      /label="T78S"
      Mutation        87
+                     /name="K87R"
                      /label="K87R"
      Mutation        88
+                     /name="P88A"
                      /label="P88A"
      Mutation        107
+                     /name="Q10T"
                      /label="Q10T"
      CDR             26..35
+                     /name="CDR-H1"
                      /label="CDR-H1"
      CDR             50..59
+                     /name="CDR-H2"
                      /label="CDR-H2"
      CDR             99..101
+                     /name="CDR-H3"
                      /label="CDR-H3"
      CDS             1..112
+                     /name="IgG-H"
                      /label="IgG-H"
      Warning         53..55
+                     /name="Deamidation"
                      /label="Deamidation"
 ORIGIN
         1 evqlvesggg lvqpggslrl scaasgftfs sygmswvrqa pgkglelvas insnggstyy
@@ -132,7 +154,7 @@ ORIGIN
         e.g. this is the file the user originally uploaded, byte for byte.
         """
         destination_filename = 'output.fsa'
-        absolute_location = example_02d_download_original_file(296713, destination_filename)
+        absolute_location = example_02d_download_original_file(296713, destination_filename, tempfile.gettempdir())
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, './sample_data/adimab/137_adimab_VH.fsa')

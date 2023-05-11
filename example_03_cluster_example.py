@@ -1,7 +1,7 @@
 import os
 
-from library.models.job_type import JobType
-from library.pipebio_client import PipebioClient
+from pipebio.models.job_type import JobType
+from pipebio.pipebio_client import PipebioClient
 
 
 def example_03_cluster_example(sequence_document_id: int, target_folder_id: int = None):
@@ -18,7 +18,7 @@ def example_03_cluster_example(sequence_document_id: int, target_folder_id: int 
 
     # Display api key user details.
     user = client.user
-    print('\nUsing api key for {}. \n'.format(user['firstName'], user['lastName']))
+    print('\nUsing api key for {} {}. \n'.format(user['firstName'], user['lastName']))
 
     # Get a list of all available projects for the user's organization.
     projects = client.shareables.list()
@@ -66,4 +66,4 @@ def example_03_cluster_example(sequence_document_id: int, target_folder_id: int 
 
 
 if __name__ == "__main__":
-    example_03_cluster_example(298154)
+    example_03_cluster_example(296716, 296712)

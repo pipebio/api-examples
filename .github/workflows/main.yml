@@ -14,21 +14,23 @@ jobs:
   test-examples:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v2
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.9' # Version range or exact version of a Python version to use, using SemVer's version range syntax
           architecture: 'x64' # optional x64 or x86. Defaults to x64 if not specified
 
       - name: Checkout github repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           lfs: true
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
+        name: api-examples-cache
+        id: api-examples-cache
         with:
           path: |
             './jobs/.pip'
-          key: ${{ runner.os }}-python-cache-v2
+          key: ${{ runner.os }}-python-cache-v3
 
       - name: Install
         run: bash ./bin/install.sh
