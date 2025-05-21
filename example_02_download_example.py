@@ -5,7 +5,6 @@ from pipebio.models.export_format import ExportFormat
 from pipebio.pipebio_client import PipebioClient
 from pipebio.util import Util
 
-
 def get_sequence_id():
     sequence_document_id = os.environ['TARGET_DOCUMENT_ID']
 
@@ -19,7 +18,7 @@ def example_02a_download_result_as_tsv(document_id: int, destination_filename: s
     """
     Download the raw file as a TSV.
     """
-    client = PipebioClient()
+    client = PipebioClient(url=os.environ['PIPEBIO_URL'])
 
     # Display api key user details.
     user = client.user
@@ -39,7 +38,7 @@ def example_02b_download_result_to_memory_to_do_more_work(document_id: int):
     """
     Download the file into memory to do more work
     """
-    client = PipebioClient()
+    client = PipebioClient(url=os.environ['PIPEBIO_URL'])
 
     # Display api key user details.
     user = client.user
@@ -52,7 +51,7 @@ def example_02c_download_result_to_biological_format(document_id, destination_lo
     """
     Download the format in Genbank, Fasta, Fastq, Ab1 etc.
     """
-    client = PipebioClient()
+    client = PipebioClient(url=os.environ['PIPEBIO_URL'])
 
     # Display api key user details.
     user = client.user
@@ -68,7 +67,7 @@ def example_02d_download_original_file(document_id: int, destination_filename: s
     """
     Download the original, un-parsed file.
    """
-    client = PipebioClient()
+    client = PipebioClient(url=os.environ['PIPEBIO_URL'])
 
     # Display api key user details.
     user = client.user

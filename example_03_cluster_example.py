@@ -14,7 +14,7 @@ def example_03_cluster_example(sequence_document_id: int, target_folder_id: int 
     if sequence_document_id is None or project_name is None:
         raise Exception("Error! Set sequence_document_id and project_name to continue.")
 
-    client = PipebioClient()
+    client = PipebioClient(url=os.environ['PIPEBIO_URL'])
 
     # Display api key user details.
     user = client.user
