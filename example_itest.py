@@ -57,7 +57,7 @@ class ExampleE2ETests(unittest.TestCase):
         result = example_02b_download_result_to_memory_to_do_more_work(296717)
 
         # The result is a map of id to row data.
-        # To get the row values we take the values and sort by name.
+        # To get the row values, we take the values and sort by name.
         in_memory_rows = sorted(list(result.values()), key=lambda row: row['name'])
 
         # Here you can get the name, sequence, annotations and all the other properties.
@@ -65,7 +65,7 @@ class ExampleE2ETests(unittest.TestCase):
 
     def test_example_02c_downloads_results_to_genbank_format(self):
         """
-        Download a PipeBio file and specify the result format. In this case we choose Genbank format.
+        Download a PipeBio file and specify the result format. In this case we choose the Genbank format.
         """
         result = example_02c_download_result_to_biological_format(296717, tempfile.gettempdir())
         # NOTE: The date is intentionally modified below so that our tests will pass, even as time marches on.

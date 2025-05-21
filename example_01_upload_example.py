@@ -28,7 +28,7 @@ def example_01a_upload_example_fasta():
     else:
         folder_id = int(folder_id)
 
-    client = PipebioClient()
+    client = PipebioClient(url=os.environ['PIPEBIO_URL'])
 
     # Display api key user details.
     user = client.user
@@ -69,7 +69,7 @@ def example_01b_upload_example_tsv():
     else:
         folder_id = int(folder_id)
 
-    client = PipebioClient()
+    client = PipebioClient(url=os.environ['PIPEBIO_URL'])
 
     # Display api key user details.
     user = client.user
