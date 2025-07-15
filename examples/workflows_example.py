@@ -3,7 +3,8 @@ import os
 from inspect import getsourcefile
 from os.path import dirname
 
-client = PipebioClient(url='https://app.pipebio.com')
+base_url = 'https://app.pipebio.com'
+client = PipebioClient(url=base_url)
 
 # Set the following value to the id of the project you want to run inside.
 current_project_id = os.environ['TARGET_SHAREABLE_ID']
@@ -44,7 +45,7 @@ workflow_folder_name = workflow_folder['name']
 workflow_folder_path = workflow_folder['path']
 print(
     f'Created folder "{workflow_folder_name}", '
-    f'here: https://app.pipebio.com/api/v2/entities/_open?entityIds={workflow_folder_id}'
+    f'here: {base_url}/api/v2/entities/_open?entityIds={workflow_folder_id}'
 )
 
 # Run the workflow.

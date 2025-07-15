@@ -4,7 +4,6 @@ import subprocess
 import pytest
 from pathlib import Path
 
-import os
 from pipebio.pipebio_client import PipebioClient
 
 
@@ -13,10 +12,24 @@ def get_project_root():
     return Path(__file__).parent
 
 
+def pytest_generate_tests(metafunc):
+    """Generate test cases dynamically for each example file."""
+    if "example_file" in metafunc.fixturenames:
+        examples_dir = get_project_root() / "examples"
+        example_files = sorted(examples_dir.glob("*.py"))
+        
+        # Skip test if no examples found
+        if not example_files:
+            pytest.skip("No example files found in the examples directory")
+            
+        metafunc.parametrize("example_file", example_files, ids=[f.name for f in example_files])
+
+
 class TestExamples:
     """Integration tests for all example scripts."""
 
-    def run_example(self, script_path):
+    @staticmethod
+    def run_example(script_path):
         """Run an example script as a subprocess and check return code."""
         # Run the script
         result = subprocess.run(
@@ -35,32 +48,23 @@ class TestExamples:
         assert result.returncode == 0, f"Example {script_path.name} failed with exit code {result.returncode}"
 
         return result
-
-    def test_all_examples(self):
-
-        """Test that all Python files in the examples directory run successfully."""
-        examples_dir = get_project_root() / "examples"
-        example_files = examples_dir.glob("*.py")
-
-        # Sort the files to ensure consistent test order
-        example_files = sorted(example_files)
-
+        
+    def test_example(self, example_file):
+        """Test that the given example file runs successfully."""
         to_skip = ['import_from_aws.py']
+        
+        if example_file.name in to_skip:
+            pytest.skip(f"Skipping {example_file.name}")
+        
+        print(f"Testing {example_file.name}", flush=True)
+        TestExamples.run_example(example_file)
+        
+    def test_cleanup(self):
+        """Clean up resources after all tests have run."""
+        TestExamples.clean_up()
 
-        # Skip test if no examples found
-        if not example_files:
-            pytest.skip("No example files found in the examples directory")
-
-        for example_file in example_files:
-            if example_file.name in to_skip:
-                print(f"Skipping {example_file.name}", flush=True)
-            else:
-                print(f"Testing {example_file.name}", flush=True)
-                result = self.run_example(example_file)
-
-        self.clean_up()
-
-    def clean_up(self):
+    @staticmethod
+    def clean_up():
         client = PipebioClient(url='https://app.pipebio.com')
         shareable_id = os.environ['TARGET_SHAREABLE_ID']
         folder_id = os.environ['TARGET_FOLDER_ID']
