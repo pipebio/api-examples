@@ -40,4 +40,6 @@ jobs:
           PIPE_API_KEY: ${{ secrets.PIPE_API_KEY }}
           PROJECT_NAME: ${{ secrets.PROJECT_NAME }}
           TARGET_FOLDER_ID: ${{ secrets.TARGET_FOLDER_ID }}
+          TARGET_SHAREABLE_ID: ${{ secrets.TARGET_SHAREABLE_ID }}
+          TARGET_DOCUMENT_ID: ${{ secrets.TARGET_DOCUMENT_ID }}
         run: bash ./bin/run-tests.sh

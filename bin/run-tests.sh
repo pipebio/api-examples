@@ -1,1 +1,1 @@
-python -m pytest -c pytest.ini
+python -m pytest -c pytest.ini -v
