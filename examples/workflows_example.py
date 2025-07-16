@@ -34,11 +34,11 @@ for job in upload_jobs:
 workflow_folder = client.entities.create_folder(
     current_project_id,
     # NOTE: The parameters name & id are back to front. We'll fix that in an upcoming version.
-    target_folder_id,
-    'Trial WF',
+    name='Trial WF',
+    parent_id=target_folder_id,
     # Optionally hide the workflow results until the Workflow is done.
     # While you're working on the workflow maybe it's best to show the folder.
-    True,
+    visible=True,
 )
 workflow_folder_id = workflow_folder['id']
 workflow_folder_name = workflow_folder['name']
