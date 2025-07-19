@@ -10,7 +10,7 @@ from pipebio.models.upload_summary import UploadSummary
 from pipebio.pipebio_client import PipebioClient
 from pipebio.uploader import Uploader
 
-folder_id = int(os.environ['TARGET_FOLDER_ID'])
+folder_id = os.environ['TARGET_FOLDER_ID']
 shareable_id = os.environ['TARGET_SHAREABLE_ID']
 sequence_document_kind = SequenceDocumentKind.DNA
 

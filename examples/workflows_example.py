@@ -19,7 +19,7 @@ germline_id = next(germline['id'] for germline in germlines['data'] if germline[
 
 upload_jobs = client.upload_files(
     absolute_folder_path=os.path.join(dirname(getsourcefile(lambda: 0)), f'../sample_data/adimab/'),
-    parent_id=int(target_folder_id),
+    parent_id=target_folder_id,
     project_id=current_project_id,
     filename_pattern='.*\.fsa',
     poll_jobs=True
@@ -32,12 +32,11 @@ for job in upload_jobs:
 
 # Create a folder to store the results of this workflow.
 workflow_folder = client.entities.create_folder(
-    current_project_id,
-    # NOTE: The parameters name & id are back to front. We'll fix that in an upcoming version.
+    project_id=current_project_id,
     name='Trial WF',
     parent_id=target_folder_id,
     # Optionally hide the workflow results until the Workflow is done.
-    # While you're working on the workflow maybe it's best to show the folder.
+    # While you're working on the workflow you may like to hide hide the folder and set it visible afterwards.
     visible=True,
 )
 workflow_folder_id = workflow_folder['id']

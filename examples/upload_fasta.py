@@ -4,7 +4,7 @@ from os.path import dirname
 from pipebio.pipebio_client import PipebioClient
 
 
-folder_id = int(os.environ['TARGET_FOLDER_ID'])
+folder_id = os.environ['TARGET_FOLDER_ID']
 shareable_id = os.environ['TARGET_SHAREABLE_ID']
 
 client = PipebioClient(url='https://app.pipebio.com')

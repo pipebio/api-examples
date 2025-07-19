@@ -1,7 +1,7 @@
 import os
 from pipebio.pipebio_client import PipebioClient
 
-document_id = int(os.environ['TARGET_DOCUMENT_ID'])
+document_id = os.environ['TARGET_DOCUMENT_ID']
 
 client = PipebioClient(url='https://app.pipebio.com')
 
