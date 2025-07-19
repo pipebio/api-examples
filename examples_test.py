@@ -70,7 +70,6 @@ class TestExamples:
         folder_id = os.environ['TARGET_FOLDER_ID']
         entities = client.shareables.list_entities(shareable_id)
         target_folder = client.entities.get(folder_id)
-        entity_ids = list(
-            int(e['id']) for e in entities if e['path'].startswith(target_folder['path']) and e['id'] != folder_id)
+        entity_ids = list(e['id'] for e in entities if e['path'].startswith(target_folder['path']) and e['id'] != folder_id)
         if len(entity_ids):
             client.entities.delete(entity_ids)
