@@ -38,7 +38,7 @@ To ensure these examples work correctly, we have integration tests that run each
 uv pip install pytest
 
 # Run the integration tests
-python -m pytest -c pytest.ini
+python -m pytest -c pytest.ini -v
 ```
 
 The tests will check that each example script can run to completion without errors.

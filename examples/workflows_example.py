@@ -36,7 +36,7 @@ workflow_folder = client.entities.create_folder(
     name='Trial WF',
     parent_id=target_folder_id,
     # Optionally hide the workflow results until the Workflow is done.
-    # While you're working on the workflow maybe it's best not to show the folder.
+    # While you're working on the workflow you may like to hide hide the folder and set it visible afterwards.
     visible=True,
 )
 workflow_folder_id = workflow_folder['id']
