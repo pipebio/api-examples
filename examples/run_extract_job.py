@@ -4,8 +4,8 @@ from pipebio.models.job_type import JobType
 
 client = PipebioClient(url='https://app.pipebio.com')
 shareable_id = os.environ['TARGET_SHAREABLE_ID']
-folder_id = int(os.environ['TARGET_FOLDER_ID'])
-document_id = int(os.environ['TARGET_DOCUMENT_ID'])
+folder_id = os.environ['TARGET_FOLDER_ID']
+document_id = os.environ['TARGET_DOCUMENT_ID']
 
 
 
