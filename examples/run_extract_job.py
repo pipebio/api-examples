@@ -20,7 +20,7 @@ new_folder = client.entities.create_folder(
 # Run an extract job and put the results in the new_folder we just created.
 job_id = client.jobs.create(
     shareable_id=shareable_id,
-    name='Extract job from API',
+    name='Extract job from SDK',
     job_type=JobType.ExtractJob,
     # Either hard code input entity ids or get these from the output_entity_ids from a previous job.
     input_entity_ids=[document_id],
