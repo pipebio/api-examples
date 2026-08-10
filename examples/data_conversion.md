@@ -10,7 +10,7 @@ python -m pip install pyarrow duckdb
 
 The examples write gzip-compressed output by default. Remove `COMPRESSION GZIP` from the DuckDB examples, or use a destination without `.gz` for the PyArrow example, when uncompressed output is required.
 
-PipeBio TSV exports use an unquoted dialect: no quote character, no escape character, and blank fields for both `NULL` and empty strings. Tabs, newlines, and carriage returns inside string values are replaced with spaces so row alignment is preserved. CSV output keeps standard quoting.
+PipeBio TSV exports use an unquoted dialect: no quote character, no escape character, and blank fields for both `NULL` and empty strings. Tabs, newlines, and carriage returns inside string values are replaced with spaces so row alignment is preserved. Nested columns containing strings are serialized to text before the same sanitization is applied. CSV output keeps standard quoting.
 
 ## Parquet to TSV or CSV with DuckDB
 
@@ -35,9 +35,13 @@ def build_tsv_safe_sql(connection: duckdb.DuckDBPyConnection, local_sql: str) ->
     sanitized_cols = []
     for col_name, col_type, *_ in columns_info:
         escaped_name = col_name.replace('"', '""')
-        if col_type.upper() == "VARCHAR":
+        upper_type = col_type.upper()
+        if "VARCHAR" in upper_type:
+            value_expression = f'"{escaped_name}"'
+            if upper_type != "VARCHAR":
+                value_expression = f'CAST({value_expression} AS VARCHAR)'
             sanitized_cols.append(
-                f'REPLACE(REPLACE(REPLACE("{escaped_name}", {tab}, \' \'), '
+                f"REPLACE(REPLACE(REPLACE({value_expression}, {tab}, ' '), "
                 f"{line_feed}, ' '), {carriage_return}, ' ') "
                 f'AS "{escaped_name}"'
             )
@@ -272,9 +276,13 @@ def build_tsv_safe_sql(connection: duckdb.DuckDBPyConnection, local_sql: str) ->
     sanitized_cols = []
     for col_name, col_type, *_ in columns_info:
         escaped_name = col_name.replace('"', '""')
-        if col_type.upper() == "VARCHAR":
+        upper_type = col_type.upper()
+        if "VARCHAR" in upper_type:
+            value_expression = f'"{escaped_name}"'
+            if upper_type != "VARCHAR":
+                value_expression = f'CAST({value_expression} AS VARCHAR)'
             sanitized_cols.append(
-                f'REPLACE(REPLACE(REPLACE("{escaped_name}", {tab}, \' \'), '
+                f"REPLACE(REPLACE(REPLACE({value_expression}, {tab}, ' '), "
                 f"{line_feed}, ' '), {carriage_return}, ' ') "
                 f'AS "{escaped_name}"'
             )
