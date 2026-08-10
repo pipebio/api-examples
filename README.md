@@ -37,9 +37,15 @@
 | `upload_fasta.py` | Upload a FASTA file via signed URL |
 | `upload_tsv.py` | Create a document and upload TSV rows |
 | `download_as_tsv.py` | Download a document as TSV via `_extract` |
-| `download_parquet_duckdb.py` | Download full document as Parquet shards via `_extractV2` (DUCKDB format) |
+| `download_duckdb.py` | Export a document as DuckDB via `client.export()` |
+| `download_original_file.py` | Download the original uploaded file for a document |
+| `download_parquet.py` | Export a document as Parquet via `client.export()` |
+| `download_to_genbank.py` | Export a document as GenBank via `client.export()` |
+| `download_to_memory.py` | Download sequence data into memory |
+| `entities_check_if_folder_exists.py` | Check whether a folder name exists in a project |
+| `entities_get_children_of_folder.py` | List child entities under a folder path |
+| `import_from_aws.py` | Import known S3 object keys via `AwsImportJob` |
 | `merge_assay_data.py` | Merge assay data into a document via `client.entities.merge()` |
-| `import_from_aws.py` | Import known S3 object keys via `AwsImportJob` (documented API) |
 | `run_extract_job.py` | Run an Extract job |
 | `workflows_example.py` | Upload files and run a workflow |
 

@@ -1,13 +1,8 @@
 """
 AWS S3 import example.
 
-This example uses AwsImportJob, the documented public API for importing files from S3.
-Provide object keys explicitly in bucketFiles below.
-
-Note: PipeBio also exposes an internal aws-integration endpoint for listing bucket
-objects (GET /api/v2/aws-integration/buckets/{bucketName}/objects). That route is not
-part of the public OpenAPI contract and may change without notice. Prefer configuring
-AWS import in the PipeBio UI and supplying known object keys here.
+Import known S3 object keys via AwsImportJob. Obtain keys from your bucket
+inventory or the PipeBio AWS import UI after configuring bucket access.
 """
 import os
 
@@ -16,8 +11,8 @@ from pipebio.pipebio_client import PipebioClient
 
 client = PipebioClient(url='https://app.pipebio.com')
 
-bucket_name = os.environ.get('AWS_IMPORT_BUCKET_NAME', 'TODO')
-shareable_id = os.environ.get('TARGET_SHAREABLE_ID', 'TODO')
+bucket_name = os.environ.get('AWS_IMPORT_BUCKET_NAME') or 'TODO'
+shareable_id = os.environ.get('TARGET_SHAREABLE_ID') or 'TODO'
 target_folder_id = os.environ.get('TARGET_FOLDER_ID')
 
 # List the S3 object keys to import. Obtain these from your bucket inventory or the
@@ -51,7 +46,7 @@ params = {
     'targetFolderId': target_folder_id,
 }
 
-job = client.jobs.create(
+job_id = client.jobs.create(
     shareable_id=shareable_id,
     input_entity_ids=[],
     job_type=JobType.AwsImportJob,
@@ -60,4 +55,4 @@ job = client.jobs.create(
     poll_jobs=True,
 )
 
-print(job)
+print(f'AWS import job {job_id} finished')
