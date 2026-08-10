@@ -10,6 +10,8 @@ python -m pip install pyarrow duckdb
 
 The examples write gzip-compressed output by default. Remove `COMPRESSION GZIP` from the DuckDB examples, or use a destination without `.gz` for the PyArrow example, when uncompressed output is required.
 
+PipeBio TSV exports use an unquoted dialect: no quote character, no escape character, and blank fields for both `NULL` and empty strings. Tabs, newlines, and carriage returns inside string values are replaced with spaces so row alignment is preserved. Nested columns containing strings are serialized to text before the same sanitization is applied. CSV output keeps standard quoting.
+
 ## Parquet to TSV or CSV with DuckDB
 
 This version accepts either a single Parquet file or a directory containing Parquet shards.
@@ -22,6 +24,49 @@ import duckdb
 
 def sql_string(value: str) -> str:
     return "'" + value.replace("'", "''") + "'"
+
+
+def build_tsv_safe_sql(connection: duckdb.DuckDBPyConnection, local_sql: str) -> str:
+    """Sanitize VARCHAR columns for PipeBio's unquoted TSV dialect."""
+    tab = "chr(9)"
+    line_feed = "chr(10)"
+    carriage_return = "chr(13)"
+    columns_info = connection.execute(f"DESCRIBE ({local_sql})").fetchall()
+    sanitized_cols = []
+    for col_name, col_type, *_ in columns_info:
+        escaped_name = col_name.replace('"', '""')
+        upper_type = col_type.upper()
+        if "VARCHAR" in upper_type:
+            value_expression = f'"{escaped_name}"'
+            if upper_type != "VARCHAR":
+                value_expression = f'CAST({value_expression} AS VARCHAR)'
+            sanitized_cols.append(
+                f"REPLACE(REPLACE(REPLACE({value_expression}, {tab}, ' '), "
+                f"{line_feed}, ' '), {carriage_return}, ' ') "
+                f'AS "{escaped_name}"'
+            )
+        else:
+            sanitized_cols.append(f'"{escaped_name}"')
+    return f"SELECT {', '.join(sanitized_cols)} FROM ({local_sql})"
+
+
+def duckdb_copy_options(delimiter: str) -> str:
+    delimiter_sql = sql_string(delimiter)
+    if delimiter == "\t":
+        return f"""
+            FORMAT CSV,
+            HEADER,
+            DELIMITER {delimiter_sql},
+            QUOTE '',
+            ESCAPE '',
+            COMPRESSION GZIP
+        """
+    return f"""
+        FORMAT CSV,
+        HEADER,
+        DELIMITER {delimiter_sql},
+        COMPRESSION GZIP
+    """
 
 
 def parquet_to_delimited_duckdb(
@@ -40,25 +85,23 @@ def parquet_to_delimited_duckdb(
 
     source_sql = sql_string(str(parquet_source))
     temporary_path_sql = sql_string(str(temporary_path))
-    delimiter_sql = sql_string(delimiter)
+    inner_sql = f"SELECT * FROM read_parquet({source_sql})"
 
     connection = duckdb.connect()
     try:
         connection.execute("SET memory_limit='1GB'")
         connection.execute("SET threads=1")
         connection.execute("SET preserve_insertion_order=false")
+        if delimiter == "\t":
+            inner_sql = build_tsv_safe_sql(connection, inner_sql)
         result = connection.execute(
             f"""
             COPY (
-                SELECT *
-                FROM read_parquet({source_sql})
+                {inner_sql}
             )
             TO {temporary_path_sql}
             (
-                FORMAT CSV,
-                HEADER,
-                DELIMITER {delimiter_sql},
-                COMPRESSION GZIP
+                {duckdb_copy_options(delimiter)}
             )
             """
         ).fetchone()
@@ -92,18 +135,34 @@ For wide datasets, iterating over each Parquet file separately avoids the extra 
 
 ```python
 from pathlib import Path
+import csv
 import gzip
+import io
 from typing import BinaryIO
 
+import pyarrow as pa
+import pyarrow.compute as pc
 import pyarrow.csv as csv_writer
 import pyarrow.parquet as pq
 
 
 def open_output(path: Path) -> BinaryIO:
-    if path.name.endswith(".gz"):
+    if path.name.removesuffix(".part").endswith(".gz"):
         return gzip.open(path, "wb", compresslevel=1)
 
     return path.open("wb")
+
+
+def sanitize_batch_for_unquoted_tsv(batch: pa.RecordBatch) -> pa.RecordBatch:
+    """Replace tabs and line breaks in string columns for unquoted TSV."""
+    columns = []
+    for field in batch.schema:
+        column = batch.column(field.name)
+        if pa.types.is_string(field.type) or pa.types.is_large_string(field.type):
+            for char in ("\t", "\n", "\r"):
+                column = pc.replace_substring(column, char, " ")
+        columns.append(column)
+    return pa.RecordBatch.from_arrays(columns, names=batch.schema.names)
 
 
 def parquet_to_delimited_pyarrow(
@@ -138,16 +197,38 @@ def parquet_to_delimited_pyarrow(
                     batch_size=batch_size,
                     use_threads=False,
                 ):
-                    options = csv_writer.WriteOptions(
-                        include_header=first_batch,
-                        delimiter=delimiter,
-                        batch_size=batch_size,
-                    )
-                    csv_writer.write_csv(
-                        batch,
-                        output,
-                        write_options=options,
-                    )
+                    if delimiter == "\t":
+                        batch = sanitize_batch_for_unquoted_tsv(batch)
+                        chunk_as_df = batch.to_pandas(integer_object_nulls=True)
+                        chunk_as_df.columns = [
+                            str(column)
+                            .replace("\t", " ")
+                            .replace("\n", " ")
+                            .replace("\r", " ")
+                            for column in chunk_as_df.columns
+                        ]
+                        buffer = io.StringIO()
+                        chunk_as_df.to_csv(
+                            buffer,
+                            sep="\t",
+                            header=first_batch,
+                            index=False,
+                            quoting=csv.QUOTE_NONE,
+                            quotechar=None,
+                        )
+                        output.write(buffer.getvalue().encode("utf-8"))
+                    else:
+                        options = csv_writer.WriteOptions(
+                            include_header=first_batch,
+                            delimiter=delimiter,
+                            batch_size=batch_size,
+                            quoting_style="needed",
+                        )
+                        csv_writer.write_csv(
+                            batch,
+                            output,
+                            write_options=options,
+                        )
                     first_batch = False
                     rows_written += batch.num_rows
     except Exception:
@@ -186,6 +267,49 @@ def sql_identifier(value: str) -> str:
     return '"' + value.replace('"', '""') + '"'
 
 
+def build_tsv_safe_sql(connection: duckdb.DuckDBPyConnection, local_sql: str) -> str:
+    """Sanitize VARCHAR columns for PipeBio's unquoted TSV dialect."""
+    tab = "chr(9)"
+    line_feed = "chr(10)"
+    carriage_return = "chr(13)"
+    columns_info = connection.execute(f"DESCRIBE ({local_sql})").fetchall()
+    sanitized_cols = []
+    for col_name, col_type, *_ in columns_info:
+        escaped_name = col_name.replace('"', '""')
+        upper_type = col_type.upper()
+        if "VARCHAR" in upper_type:
+            value_expression = f'"{escaped_name}"'
+            if upper_type != "VARCHAR":
+                value_expression = f'CAST({value_expression} AS VARCHAR)'
+            sanitized_cols.append(
+                f"REPLACE(REPLACE(REPLACE({value_expression}, {tab}, ' '), "
+                f"{line_feed}, ' '), {carriage_return}, ' ') "
+                f'AS "{escaped_name}"'
+            )
+        else:
+            sanitized_cols.append(f'"{escaped_name}"')
+    return f"SELECT {', '.join(sanitized_cols)} FROM ({local_sql})"
+
+
+def duckdb_copy_options(delimiter: str) -> str:
+    delimiter_sql = sql_string(delimiter)
+    if delimiter == "\t":
+        return f"""
+            FORMAT CSV,
+            HEADER,
+            DELIMITER {delimiter_sql},
+            QUOTE '',
+            ESCAPE '',
+            COMPRESSION GZIP
+        """
+    return f"""
+        FORMAT CSV,
+        HEADER,
+        DELIMITER {delimiter_sql},
+        COMPRESSION GZIP
+    """
+
+
 def database_to_delimited(
     database: str | Path,
     table: str,
@@ -200,25 +324,23 @@ def database_to_delimited(
 
     temporary_path_sql = sql_string(str(temporary_path))
     table_sql = sql_identifier(table)
-    delimiter_sql = sql_string(delimiter)
+    inner_sql = f"SELECT * FROM {table_sql}"
 
     connection = duckdb.connect(str(database_path), read_only=True)
     try:
         connection.execute("SET memory_limit='512MB'")
         connection.execute("SET threads=1")
         connection.execute("SET preserve_insertion_order=false")
+        if delimiter == "\t":
+            inner_sql = build_tsv_safe_sql(connection, inner_sql)
         result = connection.execute(
             f"""
             COPY (
-                SELECT *
-                FROM {table_sql}
+                {inner_sql}
             )
             TO {temporary_path_sql}
             (
-                FORMAT CSV,
-                HEADER,
-                DELIMITER {delimiter_sql},
-                COMPRESSION GZIP
+                {duckdb_copy_options(delimiter)}
             )
             """
         ).fetchone()
