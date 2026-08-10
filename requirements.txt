@@ -1,2 +1,2 @@
-pipebio~=5.0.4
+pipebio~=5.2.0
 pytest~=6.2.5

@@ -10,7 +10,7 @@
 
 ## Installation
 
-- [Python3](https://wsvincent.com/install-python3-mac/) or just `brew install python@3.7`
+- [Python3](https://wsvincent.com/install-python3-mac/) or just `brew install python@3.9`
 - Install uv: `pip install uv` or follow [uv installation guide](https://github.com/astral-sh/uv)
 - Create a virtual environment and install dependencies in one step: `uv venv && source venv/bin/activate && uv pip install -r requirements.txt`
 - Alternatively, step by step:
@@ -26,8 +26,22 @@
   export TARGET_FOLDER_ID="your_folder_id"
   export TARGET_SHAREABLE_ID="your_shareable_id"
   export TARGET_DOCUMENT_ID="your_document_id"
+  export AWS_IMPORT_BUCKET_NAME="your_bucket_name"  # for import_from_aws.py only
   ```
 - Please contact support@pipebio.com for help.
+
+### Example overview
+
+| Script | What it demonstrates |
+|--------|---------------------|
+| `upload_fasta.py` | Upload a FASTA file via signed URL |
+| `upload_tsv.py` | Create a document and upload TSV rows |
+| `download_as_tsv.py` | Download a document as TSV via `_extract` |
+| `download_parquet_duckdb.py` | Download full document as Parquet shards via `_extractV2` (DUCKDB format) |
+| `merge_assay_data.py` | Merge assay data into a document via `client.entities.merge()` |
+| `import_from_aws.py` | Import known S3 object keys via `AwsImportJob` (documented API) |
+| `run_extract_job.py` | Run an Extract job |
+| `workflows_example.py` | Upload files and run a workflow |
 
 ## Running Tests
 

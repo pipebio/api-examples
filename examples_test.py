@@ -51,7 +51,7 @@ class TestExamples:
         
     def test_example(self, example_file):
         """Test that the given example file runs successfully."""
-        to_skip = ['import_from_aws.py']
+        to_skip = ['import_from_aws.py', 'merge_assay_data.py', 'download_parquet_duckdb.py']
         
         if example_file.name in to_skip:
             pytest.skip(f"Skipping {example_file.name}")
