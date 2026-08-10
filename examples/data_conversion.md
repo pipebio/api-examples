@@ -35,7 +35,7 @@ def build_tsv_safe_sql(connection: duckdb.DuckDBPyConnection, local_sql: str) ->
     sanitized_cols = []
     for col_name, col_type, *_ in columns_info:
         escaped_name = col_name.replace('"', '""')
-        if "VARCHAR" in col_type.upper():
+        if col_type.upper() == "VARCHAR":
             sanitized_cols.append(
                 f'REPLACE(REPLACE(REPLACE("{escaped_name}", {tab}, \' \'), '
                 f"{line_feed}, ' '), {carriage_return}, ' ') "
@@ -196,6 +196,13 @@ def parquet_to_delimited_pyarrow(
                     if delimiter == "\t":
                         batch = sanitize_batch_for_unquoted_tsv(batch)
                         chunk_as_df = batch.to_pandas(integer_object_nulls=True)
+                        chunk_as_df.columns = [
+                            str(column)
+                            .replace("\t", " ")
+                            .replace("\n", " ")
+                            .replace("\r", " ")
+                            for column in chunk_as_df.columns
+                        ]
                         buffer = io.StringIO()
                         chunk_as_df.to_csv(
                             buffer,
@@ -203,6 +210,7 @@ def parquet_to_delimited_pyarrow(
                             header=first_batch,
                             index=False,
                             quoting=csv.QUOTE_NONE,
+                            quotechar=None,
                         )
                         output.write(buffer.getvalue().encode("utf-8"))
                     else:
@@ -264,7 +272,7 @@ def build_tsv_safe_sql(connection: duckdb.DuckDBPyConnection, local_sql: str) ->
     sanitized_cols = []
     for col_name, col_type, *_ in columns_info:
         escaped_name = col_name.replace('"', '""')
-        if "VARCHAR" in col_type.upper():
+        if col_type.upper() == "VARCHAR":
             sanitized_cols.append(
                 f'REPLACE(REPLACE(REPLACE("{escaped_name}", {tab}, \' \'), '
                 f"{line_feed}, ' '), {carriage_return}, ' ') "
