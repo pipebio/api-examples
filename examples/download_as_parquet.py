@@ -9,8 +9,13 @@ document_id = os.environ['TARGET_DOCUMENT_ID']
 
 client = PipebioClient(url='https://app.pipebio.com')
 
-# Export the full document as a DuckDB database (.db) in a ZIP archive.
-# Open the .db with duckdb.connect(path) or ATTACH, not read_parquet.
+# Export the full document as Parquet files packaged in a ZIP archive.
 destination_dir = dirname(getsourcefile(lambda: 0))
-client.export(document_id, ExportFormat.DUCKDB, destination_dir)
-print(f'DuckDB export saved to {destination_dir}')
+paths = client.export(
+    document_id,
+    ExportFormat.PARQUET,
+    destination_dir,
+    destination_filename='document.parquet',
+)
+for path in paths:
+    print(f'Parquet export saved to {path}')

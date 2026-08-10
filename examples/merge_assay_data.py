@@ -11,7 +11,8 @@ client = PipebioClient(url='https://app.pipebio.com')
 current_dir = dirname(getsourcefile(lambda: 0))
 assay_file_path = os.path.join(current_dir, '../sample_data/assay_binding_scores.tsv')
 
-# Merge assay columns into the target document by matching assay clone_id to document name.
+# Merge assay columns into the target document by matching assay clone_id to
+# document's name column.
 # This permanently modifies TARGET_DOCUMENT_ID; use a throwaway test document.
 # See https://docs.pipebio.com/docs/assay-and-functional-data
 job = client.entities.merge(

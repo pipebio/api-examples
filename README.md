@@ -10,7 +10,7 @@
 
 ## Installation
 
-- [Python3](https://wsvincent.com/install-python3-mac/) or just `brew install python@3.9`
+- [Python3](https://wsvincent.com/install-python3-mac/) or just `brew install python@3.10`
 - Install uv: `pip install uv` or follow [uv installation guide](https://github.com/astral-sh/uv)
 - Create a virtual environment and install dependencies in one step: `uv venv && source venv/bin/activate && uv pip install -r requirements.txt`
 - Alternatively, step by step:
@@ -37,9 +37,9 @@
 | `upload_fasta.py` | Upload a FASTA file via signed URL |
 | `upload_tsv.py` | Create a document and upload TSV rows |
 | `download_as_tsv.py` | Download a document as TSV via `_extract` |
-| `download_duckdb.py` | Export a document as DuckDB via `client.export()` |
+| `download_as_duckdb.py` | Export a document as DuckDB via `client.export()` |
 | `download_original_file.py` | Download the original uploaded file for a document |
-| `download_parquet.py` | Export a document as Parquet via `client.export()` |
+| `download_as_parquet.py` | Export a document as Parquet via `client.export()` |
 | `download_to_genbank.py` | Export a document as GenBank via `client.export()` |
 | `download_to_memory.py` | Download sequence data into memory |
 | `entities_check_if_folder_exists.py` | Check whether a folder name exists in a project |
