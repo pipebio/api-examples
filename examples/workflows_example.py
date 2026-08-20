@@ -1,3 +1,4 @@
+from pipebio.models.export_format import ExportFormat
 from pipebio.pipebio_client import PipebioClient
 import os
 from inspect import getsourcefile
@@ -21,7 +22,7 @@ upload_jobs = client.upload_files(
     absolute_folder_path=os.path.join(dirname(getsourcefile(lambda: 0)), f'../sample_data/adimab/'),
     parent_id=target_folder_id,
     project_id=current_project_id,
-    filename_pattern='.*\.fsa',
+    filename_pattern=r'.*\.fsa',
     poll_jobs=True
 )
 
@@ -76,10 +77,11 @@ filtered_entities = list(e for e in all_entities if
                          and e['name'].endswith('- annotated')
                          )
 
-# Download these annotated documents locally to csv.
+# Export these annotated documents locally to tsv.
 for output_entity in filtered_entities:
     output_entity_name = output_entity['name']
-    client.sequences.download(
+    client.export_to_path(
         output_entity['id'],
-        destination=os.path.join(download_absolute_location, f'{output_entity_name}.tsv')
+        destination=os.path.join(download_absolute_location, f'{output_entity_name}.tsv'),
+        format=ExportFormat.TSV,
     )

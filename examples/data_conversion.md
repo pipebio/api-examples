@@ -12,6 +12,8 @@ The examples write gzip-compressed output by default. Remove `COMPRESSION GZIP` 
 
 PipeBio TSV exports use an unquoted dialect: no quote character, no escape character, and blank fields for both `NULL` and empty strings. Tabs, newlines, and carriage returns inside string values are replaced with spaces so row alignment is preserved. Nested columns containing strings are serialized to text before the same sanitization is applied. CSV output keeps standard quoting.
 
+PipeBio's TSV and CSV exports additionally apply spreadsheet-injection sanitization, so their cell values are not always byte-identical to the stored data: a value starting with `=`, `+`, `@`, or a non-numeric `-` is prefixed with an apostrophe, and a whitespace-only value becomes empty. Parquet and DuckDB exports are exempt. The examples below reproduce the unquoted TSV dialect but deliberately not this rewriting, so their output preserves such values verbatim. Add the apostrophe prefix yourself when the goal is to match a PipeBio TSV export byte-for-byte, or when the result will be opened in a spreadsheet.
+
 ## Parquet to TSV or CSV with DuckDB
 
 This version accepts either a single Parquet file or a directory containing Parquet shards.

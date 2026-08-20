@@ -5,3 +5,12 @@ __pycache__/
 **/.DS_Store
 /Downloads/
 /.idea/
+
+# The download and export examples write their artifacts next to themselves,
+# and an exported document can be hundreds of megabytes. Only sources and docs
+# belong in examples/, so ignore everything else rather than chase filenames
+# the SDK derives from the document name.
+/examples/*
+!/examples/*/
+!/examples/*.py
+!/examples/*.md

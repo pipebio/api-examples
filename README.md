@@ -37,12 +37,12 @@
 |--------|---------------------|
 | `upload_fasta.py` | Upload a FASTA file via signed URL |
 | `upload_tsv.py` | Create a document and upload TSV rows |
-| `download_as_tsv.py` | Download a document as TSV via `_extract` |
+| `download_as_tsv.py` | Export a document as TSV via `client.export()` |
 | `download_as_duckdb.py` | Export a document as DuckDB via `client.export()` |
 | `download_original_file.py` | Download the original uploaded file for a document |
 | `download_as_parquet.py` | Export a document as Parquet via `client.export()` |
 | `download_to_genbank.py` | Export a document as GenBank via `client.export()` |
-| `download_to_memory.py` | Download sequence data into memory |
+| `download_to_memory.py` | Stream sequence records via `client.iter_sequence_records()` |
 | `entities_check_if_folder_exists.py` | Check whether a folder name exists in a project |
 | `entities_get_children_of_folder.py` | List child entities under a folder path |
 | `import_from_aws.py` | Import known S3 object keys via `AwsImportJob` |
